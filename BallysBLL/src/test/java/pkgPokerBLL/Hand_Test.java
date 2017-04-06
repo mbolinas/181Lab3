@@ -3,12 +3,15 @@ package pkgPokerBLL;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import pkgException.HandException;
 import pkgPokerEnum.eHandStrength;
 import pkgPokerEnum.eRank;
 import pkgPokerEnum.eSuit;
@@ -40,6 +43,222 @@ public class Hand_Test {
 
 	
 	
+	@Test
+	public void TestPlayer(){
+		Player p = new Player("me");
+		p.setPlayerName("you");
+		assertTrue(p.getPlayerName().equals("you"));
+	}
+	
+	@Test
+	public void TestTable(){
+		Table t = new Table();
+		Player p = new Player("me");
+		
+		t.AddPlayerToTable(p);
+		
+		
+		assertTrue(t.getTablePlayers().get(p.getPlayerID()).getPlayerName().equals("me"));
+	}
+	
+	@Test
+	public void TestTable2(){
+		Table t = new Table();
+		Player p = new Player("me");
+		
+		t.AddPlayerToTable(p);
+		t.RemovePlayerFromTable(p);
+		
+		assertTrue(t.getTablePlayers().size() == 0);
+	}
+	
+	@Test
+	public void TestGame(){
+		Game g = new Game();
+		g.AddPlayerToGame(new Player("me"));
+		assertTrue(g.getGamePlayers().size() == 1);
+	}
+	
+	
+	@Test
+	public void TestExplodeHand() {
+		Hand h = new Hand();
+		
+		h.AddCardToHand(new Card(eSuit.CLUBS, eRank.TEN, 1));
+		h.AddCardToHand(new Card(eSuit.CLUBS, eRank.TEN, 1));
+		h.AddCardToHand(new Card(eSuit.CLUBS, eRank.TEN, 1));
+		h.AddCardToHand(new Card(eSuit.CLUBS, eRank.TEN, 1));
+		h.AddCardToHand(new Card(eSuit.JOKER, eRank.JOKER, 1));
+		
+		
+		int size = Hand.ExplodeHands(h).size();
+		assertTrue(size == 52);	
+		
+	}
+	
+	@Test
+	public void TestExplodeHand2() {
+		Hand h = new Hand();
+		
+		h.AddCardToHand(new Card(eSuit.CLUBS, eRank.TEN, 1));
+		h.AddCardToHand(new Card(eSuit.CLUBS, eRank.TEN, 1));
+		h.AddCardToHand(new Card(eSuit.CLUBS, eRank.TEN, 1));
+		h.AddCardToHand(new Card(eSuit.CLUBS, eRank.TEN, 1));
+		h.AddCardToHand(new Card(eSuit.CLUBS, eRank.TEN, 1));
+		
+		
+		int size = Hand.ExplodeHands(h).size();
+		assertTrue(size == 1);	
+		
+	}
+	
+	@Test
+	public void TestExplodeHand3() {
+		Hand h = new Hand();
+		
+		h.AddCardToHand(new Card(eSuit.JOKER, eRank.JOKER, 1));
+		h.AddCardToHand(new Card(eSuit.JOKER, eRank.JOKER, 1));
+		h.AddCardToHand(new Card(eSuit.CLUBS, eRank.TEN, 1));
+		h.AddCardToHand(new Card(eSuit.CLUBS, eRank.TEN, 1));
+		h.AddCardToHand(new Card(eSuit.CLUBS, eRank.TEN, 1));
+		
+		
+		int size = Hand.ExplodeHands(h).size();
+		assertTrue(size == 2704);
+		
+	}
+	
+	@Test
+	public void TestExplodeHand4() {
+		Hand h = new Hand();
+		
+		h.AddCardToHand(new Card(eSuit.JOKER, eRank.JOKER, 1));
+		h.AddCardToHand(new Card(eSuit.JOKER, eRank.JOKER, 1));
+		h.AddCardToHand(new Card(eSuit.JOKER, eRank.JOKER, 1));
+		h.AddCardToHand(new Card(eSuit.CLUBS, eRank.TEN, 1));
+		h.AddCardToHand(new Card(eSuit.CLUBS, eRank.TEN, 1));
+		
+		
+		int size = Hand.ExplodeHands(h).size();
+		
+		assertTrue(size == 140608);
+		
+	}
+	
+	@Test
+	public void TestExplodeHand5() {
+		Hand h = new Hand();
+		
+		h.AddCardToHand(new Card(eSuit.JOKER, eRank.JOKER, 1));
+		h.AddCardToHand(new Card(eSuit.JOKER, eRank.JOKER, 1));
+		h.AddCardToHand(new Card(eSuit.JOKER, eRank.JOKER, 1));
+		h.AddCardToHand(new Card(eSuit.JOKER, eRank.JOKER, 1));
+		h.AddCardToHand(new Card(eSuit.CLUBS, eRank.TEN, 1));
+		
+		
+		int size = Hand.ExplodeHands(h).size();
+		assertTrue(size == 7311616);
+		
+	}
+	
+	@Test(expected = HandException.class)
+	public void TestHandException() throws HandException{
+		try{
+			ArrayList<Card> cards = new ArrayList<Card>();
+			cards.add(new Card(eRank.JOKER, eSuit.JOKER, 1));
+			cards.add(new Card(eRank.JOKER, eSuit.JOKER, 1));
+			cards.add(new Card(eRank.JOKER, eSuit.JOKER, 1));
+			cards.add(new Card(eRank.JOKER, eSuit.JOKER, 1));
+			
+			boolean huh = Hand.containsFiveCards(cards);
+			
+			
+		}
+		catch(HandException e){
+			throw new HandException("Does not contain 5 cards");
+		}
+	}
+	
+	
+	@Test
+	public void TestFiveOfAKind(){
+		Hand h = new Hand();
+		
+		h.AddToCardsInHand(new Card(eSuit.CLUBS, eRank.TEN,1));
+		h.AddToCardsInHand(new Card(eSuit.DIAMONDS, eRank.TEN,1));
+		h.AddToCardsInHand(new Card(eSuit.HEARTS, eRank.TEN,1));
+		h.AddToCardsInHand(new Card(eSuit.SPADES, eRank.TEN,1));
+		h.AddToCardsInHand(new Card(eSuit.JOKER, eRank.JOKER,1));
+		
+		
+		try {
+			h = h.EvaluateHand();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		assertTrue(h.getHandScore().getHandStrength() == eHandStrength.FiveOfAKind);
+	}
+	
+	@Test
+	public void TestFiveOfAKind2(){
+		Hand h = new Hand();
+		
+		h.AddToCardsInHand(new Card(eSuit.CLUBS, eRank.TEN,1));
+		h.AddToCardsInHand(new Card(eSuit.DIAMONDS, eRank.TEN,1));
+		h.AddToCardsInHand(new Card(eSuit.HEARTS, eRank.TEN,1));
+		h.AddToCardsInHand(new Card(eSuit.JOKER, eRank.JOKER,1));
+		h.AddToCardsInHand(new Card(eSuit.JOKER, eRank.JOKER,1));
+		
+		
+		try {
+			h = h.EvaluateHand();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		assertTrue(h.getHandScore().getHandStrength() == eHandStrength.FiveOfAKind);
+	}
+	
+	@Test
+	public void TestFiveOfAKind3(){
+		Hand h = new Hand();
+		
+		h.AddToCardsInHand(new Card(eSuit.CLUBS, eRank.TEN,1));
+		h.AddToCardsInHand(new Card(eSuit.DIAMONDS, eRank.TEN,1));
+		h.AddToCardsInHand(new Card(eSuit.JOKER, eRank.JOKER,1));
+		h.AddToCardsInHand(new Card(eSuit.JOKER, eRank.JOKER,1));
+		h.AddToCardsInHand(new Card(eSuit.JOKER, eRank.JOKER,1));
+		
+		
+		try {
+			h = h.EvaluateHand();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		assertTrue(h.getHandScore().getHandStrength() == eHandStrength.FiveOfAKind);
+	}
+	
+	@Test
+	public void TestFiveOfAKind5(){
+		Hand h = new Hand();
+		
+		h.AddToCardsInHand(new Card(eSuit.JOKER, eRank.JOKER,1));
+		h.AddToCardsInHand(new Card(eSuit.JOKER, eRank.JOKER,1));
+		h.AddToCardsInHand(new Card(eSuit.JOKER, eRank.JOKER,1));
+		h.AddToCardsInHand(new Card(eSuit.JOKER, eRank.JOKER,1));
+		h.AddToCardsInHand(new Card(eSuit.JOKER, eRank.JOKER,1));
+		
+		
+		try {
+			h = h.EvaluateHand();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		assertTrue(h.getHandScore().getHandStrength() == eHandStrength.FiveOfAKind);
+	}
 	
 	
 	@Test

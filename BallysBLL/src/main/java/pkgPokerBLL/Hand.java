@@ -32,6 +32,10 @@ public class Hand {
 	public ArrayList<Card> getCardsInHand() {
 		return CardsInHand;
 	}
+	
+	public void setCardsInHand(ArrayList<Card> c){
+		CardsInHand = c;
+	}
 
 	public HandScore getHandScore() {
 		return HS;
@@ -57,16 +61,130 @@ public class Hand {
 		//	Return best hand.  
 		//	TODO: Fix...  what to do if there is a tie?
 		return ExplodedHands.get(0);
+		
 	}
-
-	
-	//TODO: one hand is passed in, 1, 52, 2704, etc are passed back
-	//		No jokers, 'ReturnHands' should have one hand
-	//		One Wild/joker 'ReturnHands' should have 52 hands, etc
 	
 	public static ArrayList<Hand> ExplodeHands(Hand h) {
 
 		ArrayList<Hand> ReturnHands = new ArrayList<Hand>();
+		
+		ArrayList<Card> cards = new ArrayList<Card>();
+		for(Card c : h.getCardsInHand()){
+			if((c.geteRank() != eRank.JOKER) && (c.geteSuit() != eSuit.JOKER)){
+				cards.add(c);
+			}
+		}
+		
+		
+		//There's probably a more compact way to do this
+		if(cards.size() == 4){
+			for(eRank r1 : eRank.values()){
+				for(eSuit s1 : eSuit.values()){
+					if(r1 != eRank.JOKER && s1 != eSuit.JOKER){
+						cards.add(new Card(r1, s1, 1));
+						h.setCardsInHand(cards);
+						ReturnHands.add(h);
+						cards.remove(4);
+					}
+				}
+			}
+		}
+		else if(cards.size() == 3){
+			for(eRank r1 : eRank.values()){
+				for(eSuit s1 : eSuit.values()){
+					for(eRank r2 : eRank.values()){
+						for(eSuit s2 : eSuit.values()){
+							if(r1 != eRank.JOKER && s1 != eSuit.JOKER){
+								if(r2 != eRank.JOKER && s2 != eSuit.JOKER){
+									cards.add(new Card(r1, s1, 1));
+									cards.add(new Card(r2, s2, 1));
+									h.setCardsInHand(cards);
+									ReturnHands.add(h);
+									cards.remove(4);
+									cards.remove(3);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		else if(cards.size() == 2){
+			for(eRank r1 : eRank.values()){
+				for(eSuit s1 : eSuit.values()){
+					for(eRank r2 : eRank.values()){
+						for(eSuit s2 : eSuit.values()){
+							for(eRank r3 : eRank.values()){
+								for(eSuit s3 : eSuit.values()){
+									if(r1 != eRank.JOKER && s1 != eSuit.JOKER){
+										if(r2 != eRank.JOKER && s2 != eSuit.JOKER){
+											if(r3 != eRank.JOKER && s3 != eSuit.JOKER){
+												cards.add(new Card(r1, s1, 1));
+												cards.add(new Card(r2, s2, 1));
+												cards.add(new Card(r3, s3, 1));
+												h.setCardsInHand(cards);
+												ReturnHands.add(h);
+												cards.remove(4);
+												cards.remove(3);
+												cards.remove(2);
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		else if(cards.size() == 1){
+			for(eRank r1 : eRank.values()){
+				for(eSuit s1 : eSuit.values()){
+					for(eRank r2 : eRank.values()){
+						for(eSuit s2 : eSuit.values()){
+							for(eRank r3 : eRank.values()){
+								for(eSuit s3 : eSuit.values()){
+									for(eRank r4 : eRank.values()){
+										for(eSuit s4 : eSuit.values()){
+											if(r1 != eRank.JOKER && s1 != eSuit.JOKER){
+												if(r2 != eRank.JOKER && s2 != eSuit.JOKER){
+													if(r3 != eRank.JOKER && s3 != eSuit.JOKER){
+														if(r4 != eRank.JOKER && s4 != eSuit.JOKER){
+															cards.add(new Card(r1, s1, 1));
+															cards.add(new Card(r2, s2, 1));
+															cards.add(new Card(r3, s3, 1));
+															cards.add(new Card(r4, s4, 1));
+															h.setCardsInHand(cards);
+															ReturnHands.add(h);
+															cards.remove(4);
+															cards.remove(3);
+															cards.remove(2);
+															cards.remove(1);
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		else{
+			ReturnHands.add(h);
+		}
+		
+
+		
+		for(int counter = 5 - cards.size(); counter > 0; counter--){
+			cards.add(new Card(eRank.JOKER, eSuit.JOKER, 1));
+		}
+		h.setCardsInHand(cards);
+		
+		
 		return ReturnHands;
 	}
 
@@ -116,8 +234,8 @@ public class Hand {
 		return h;
 	}
 
-	private static boolean containsFiveCards(ArrayList<Card> c) throws HandException{
-		if(c.size() < 4){
+	public static boolean containsFiveCards(ArrayList<Card> c) throws HandException{
+		if(c.size() < 5){
 			throw new HandException("Must have five cards in hand!");
 		}
 		else{
@@ -125,7 +243,81 @@ public class Hand {
 		}
 	}
 	
-	
+	public static boolean isHandFiveOfAKind(Hand h, HandScore hs) throws HandException{
+		if(!containsFiveCards(h.getCardsInHand())){
+			return false;
+		}
+		
+//		if(h.getCardsInHand().get(eCardNo.FirstCard.getCardNo()).geteRank() == h.getCardsInHand().get(eCardNo.FifthCard.getCardNo()).geteRank()){
+//			hs.setHandStrength(eHandStrength.FiveOfAKind);
+//			hs.setHiHand(h.getCardsInHand().get(eCardNo.FifthCard.getCardNo()).geteRank());
+//			hs.setLoHand(null);
+//			return true;
+//		}
+//		else{
+//			return false;
+//		}
+		
+		ArrayList<Card> cards = new ArrayList<Card>();
+		for(Card c : h.getCardsInHand()){
+			if(c.geteRank() != eRank.JOKER && c.geteSuit() != eSuit.JOKER){
+				cards.add(c);
+			}
+		}
+		
+		if(cards.size() == 5){//Can't happen, you can't have 5 of a kind without any JOKERS
+			return false;
+		}
+		else if(cards.size() == 4){//1 JOKER
+			if(isHandFourOfAKind(h, hs)){
+				hs.setHandStrength(eHandStrength.FiveOfAKind);
+				hs.setHiHand(h.getCardsInHand().get(eCardNo.FifthCard.getCardNo()).geteRank());
+				hs.setLoHand(null);
+				return true;
+			}
+			else{
+				return false;
+			}
+		}
+		else if(cards.size() == 3){//2 JOKER
+			if(isHandThreeOfAKind(h, hs)){
+				hs.setHandStrength(eHandStrength.FiveOfAKind);
+				hs.setHiHand(h.getCardsInHand().get(eCardNo.FifthCard.getCardNo()).geteRank());
+				hs.setLoHand(null);
+				return true;
+			}
+			else{
+				return false;
+			}
+		}
+		else if(cards.size() == 2){//3 JOKER
+			if(isHandPair(h, hs)){
+				hs.setHandStrength(eHandStrength.FiveOfAKind);
+				hs.setHiHand(h.getCardsInHand().get(eCardNo.FifthCard.getCardNo()).geteRank());
+				hs.setLoHand(null);
+				return true;
+			}
+			else{
+				return false;
+			}
+		}
+		else if(cards.size() == 1){
+			hs.setHandStrength(eHandStrength.FiveOfAKind);
+			hs.setHiHand(h.getCardsInHand().get(eCardNo.FifthCard.getCardNo()).geteRank());
+			hs.setLoHand(null);
+			return true;
+		}
+		else{
+			hs.setHandStrength(eHandStrength.FiveOfAKind);
+			hs.setHiHand(h.getCardsInHand().get(eCardNo.FifthCard.getCardNo()).geteRank());
+			hs.setLoHand(null);
+			return true;
+		}
+		
+		
+		
+		
+	}
 	
 	
 	
@@ -246,28 +438,6 @@ public class Hand {
 
 		return isHandStraightFlush;
 
-	}
-
-	public static boolean isHandFiveOfAKind(Hand h, HandScore hs) throws HandException {
-		if(!containsFiveCards(h.getCardsInHand())){
-			return false;
-		}
-		
-		boolean isHandFiveOfAKind = false;
-		eRank r = h.getCardsInHand().get(eCardNo.FirstCard.getCardNo()).geteRank();
-		
-		for(Card c : h.getCardsInHand()){
-			if(  (c.geteRank() != r) && (c.geteRank() != eRank.JOKER)  ){
-				return false;
-			}
-		}
-		isHandFiveOfAKind = true;
-		
-		
-		
-		
-		
-		return isHandFiveOfAKind;
 	}
 	
 	public static boolean isHandFourOfAKind(Hand h, HandScore hs) throws HandException {
